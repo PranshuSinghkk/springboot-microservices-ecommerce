@@ -40,4 +40,9 @@ public class ProductController {
         boolean deleted = productService.deleteProduct(id);
         return deleted ? ResponseEntity.noContent().build() :  ResponseEntity.notFound().build();   // if deleted return noContent() orElse return notFound()
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam String keyword) {
+        return ResponseEntity.ok(productService.searchProducts(keyword));
+    }
 }
