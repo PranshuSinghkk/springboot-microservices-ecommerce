@@ -7,6 +7,7 @@ import com.app.ecom.model.User;
 import com.app.ecom.repository.CartItemRepository;
 import com.app.ecom.repository.ProductRepository;
 import com.app.ecom.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CartService {
 
     private final ProductRepository productRepository;
@@ -46,7 +48,7 @@ public class CartService {
         User user = userOpt.get();
 
         // if cartItem already exists in the DB fetch it
-        CartItem existingCartItem = cartItemRepository.findByUserAndProduct(user, product);
+        CartItem existingCartItem = cartItemRepository.findByUserAndProduct(user, product);     // user and product objects id is used to fetch
         // if not null update cart item quantity
         if(existingCartItem != null) {
             existingCartItem.setQuantity(existingCartItem.getQuantity() + request.getQuantity());
@@ -61,6 +63,16 @@ public class CartService {
             cartItemRepository.save(cartItem);
         }
         return true;
+    }
+
+    public boolean deleteItemFromCart(String userId, Long productId) {
+        Optional<Product> productOpt = productRepository.findById(productId);
+        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+        if(productOpt.isPresent() && userOpt.isPresent()) {
+            cartItemRepository.deleteByUserAndProduct(userOpt.get(), productOpt.get());
+            return true;
+        }
+        return false;
     }
 }
 
