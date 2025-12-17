@@ -8,25 +8,28 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
-@NoArgsConstructor
 @Data
-public class CartItem {
+@NoArgsConstructor
+@Entity(name = "orders")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne   // many CartItems belong to one User.
-    @JoinColumn(name="user_id", nullable = false)       // nullable- A CartItem must always be linked to a user.
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable = false)
     private User user;
 
-    @ManyToOne  // Many CartItems can be linked to ONE Product.
-    @JoinColumn(name="product_id", nullable = false)    // nullable- A CartItem must always have a product.
-    private Product product;
+    private BigDecimal totalAmount;
 
-    private Integer quantity;
-    private BigDecimal price;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status =  OrderStatus.PENDING;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

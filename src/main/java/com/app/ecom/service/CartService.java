@@ -83,5 +83,11 @@ public class CartService {
                 .map(cartItemRepository::findByUser) // if user is present it will return list of cartItems
                 .orElseGet(List::of);                   // or else empty list of cartItems
     }
+
+    public void clearCart(String userId) {
+        userRepository.findById(Long.valueOf(userId)).ifPresent(
+                cartItemRepository::deleteByUser
+        );
+    }
 }
 
